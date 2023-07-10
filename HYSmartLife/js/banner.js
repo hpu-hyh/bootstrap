@@ -1,7 +1,7 @@
-$(function() {
+$(function () {
 
-  var currentImg = 'none' // none  big  small
-  // 1.准备数据
+  var currentImg = 'none';
+  // 准备轮播图数据
   var banners = [
     {
       id:0,
@@ -18,63 +18,48 @@ $(function() {
       bigUrl: './img/banner2.png',
       smUrl: './img/banner2_sm.png'
     }
-  ]
+  ];
 
-  // renderBanner(banners)
-
-  $(window).on('resize',throttle( function() {
-    // console.log( $(this).outerWidth() )  // border + paddig + content 
-    var winWidth =  $(this).outerWidth()
-    var isBigScreen = winWidth >= 768
-
-    // if(currentImg === 'big' && isBigScreen) {
-    //   return
-    // }
-    // if(currentImg === 'small' && !isBigScreen) {
-    //   return
-    // }
-
-    if(currentImg === 'none'){
-      // 掉这个函数来渲染界面
-      renderBanner(banners, isBigScreen)
-    } 
-    
-    if(currentImg === 'big' && !isBigScreen) {
-      renderBanner(banners, isBigScreen)
+  // 监听视图窗口尺寸变化
+  $(window).on('resize', throttle(function () {
+    var winWidth = $(this).outerWidth();
+    var isBigScreen = winWidth >= 768;
+    if (currentImg === 'none') {
+      renderBanner(banners, isBigScreen);
     }
-
-    if(currentImg === 'small' && isBigScreen) {
-      // 掉这个函数来渲染界面
-      renderBanner(banners, isBigScreen)
+  
+    if (currentImg === 'big' && !isBigScreen) {
+      renderBanner(banners, isBigScreen);
     }
-    
-  }))
-  $(window).trigger('resize')
+    if (currentImg === 'small' && isBigScreen) {
+      renderBanner(banners, isBigScreen);
+    }
+ 
+  }));
+  // 代码模拟触发视口变化
+  $(window).trigger('resize');
 
-
+  // 动态渲染数据到页面
 
   function renderBanner(banners = [], isBigScreen) {
+    currentImg = isBigScreen ? 'big' : 'small';
+    //停掉上次调用产生的定时器
+    $('.carousel').carousel('dispose');
+    var htmlString = '';
 
-    currentImg = isBigScreen ? 'big' : 'small' 
-    // 先把之前的定时器停掉
-    $('.carousel').carousel('dispose')
-
-    var banneHtmlString = ''
-    // 2.将数据渲染到页面上
     banners.forEach(function(item, index) {
-      var active = index === 0 ? 'active' :''
-      var imgUrl = isBigScreen ? item.bigUrl: item.smUrl
-      banneHtmlString +=`
-         <div class="carousel-item ${active}" data-interval="3000">
-          <img src="${imgUrl}" class="d-block w-100" alt="...">
-        </div>
-      `
-    })
-    $('.carousel-inner').empty().append(banneHtmlString)
+      var active = index === 0 ? 'active' : '';
+      var imgUrl = isBigScreen ? item.bigUrl : item.smUrl;
+      htmlString += `
+      <div class='carousel-item ${active}'>
+          <img src='${imgUrl}' class='d-block w-100' alt='...'>
+        </div>`;
+    });
 
-    // 自动录播( 开始一个定时器 )
-    $('.carousel').carousel('cycle')
+    $('.carousel-inner').empty().append(htmlString);
+
+    // 自动轮播
+    $('.carousel').carousel('cycle');
   }
-
-
-})
+  // renderBanner(banners)
+});
